@@ -26,8 +26,8 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/.. ${CMAKE_CURRENT_SOURCE_DIR}/_bui
 # PYTHON STUFF
 find_package(SWIG REQUIRED)
 include(${SWIG_USE_FILE})
-execute_process( COMMAND python -c "from distutils import sysconfig; print sysconfig.PREFIX" OUTPUT_VARIABLE PYTHON_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE )
-execute_process( COMMAND python -c "import sys; a = sys.version; print a[:3]" OUTPUT_VARIABLE PYVERSION OUTPUT_STRIP_TRAILING_WHITESPACE )
+execute_process( COMMAND python -c "from distutils import sysconfig; print(sysconfig.PREFIX)" OUTPUT_VARIABLE PYTHON_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE )
+execute_process( COMMAND python -c "import sys; a = sys.version; print(a[:3])" OUTPUT_VARIABLE PYVERSION OUTPUT_STRIP_TRAILING_WHITESPACE )
 if(PYTHON_PREFIX)
     if(EXISTS "${PYTHON_PREFIX}/lib/libpython${PYVERSION}.dylib")
         set(PYTHON_LIBRARY "${PYTHON_PREFIX}/lib/libpython${PYVERSION}.dylib")
@@ -41,13 +41,13 @@ message(STATUS "PYTHON_INCLUDE_DIRS: ${PYTHON_INCLUDE_DIRS}")
 message(STATUS "PYTHONLIBS_VERSION_STRING: ${PYTHONLIBS_VERSION_STRING}")
 
 ## Try to determine the directory of numpy headers
-execute_process( COMMAND python -c "from numpy import distutils; path=distutils.misc_util.get_numpy_include_dirs(); print path[0]" OUTPUT_VARIABLE NUMPY_INCLUDEDIR OUTPUT_STRIP_TRAILING_WHITESPACE )
+execute_process( COMMAND python -c "from numpy import distutils; path=distutils.misc_util.get_numpy_include_dirs(); print(path[0])" OUTPUT_VARIABLE NUMPY_INCLUDEDIR OUTPUT_STRIP_TRAILING_WHITESPACE )
 if (NOT NUMPY_INCLUDE)
     SET(NUMPY_INCLUDE ${NUMPY_INCLUDEDIR} CACHE PATH "Directory for the numpy headers. If it is not set automatically it is determined by python distutils." )
 endif( NOT NUMPY_INCLUDE)
 include_directories( ${NUMPY_INCLUDE} )
 if( NOT EXISTS ${NUMPY_INCLUDE}/numpy/arrayobject.h )
-    message( FATAL_ERROR "${NUMPY_INCLUDE}/numpy/arrayobject.h header is not found. If it is installed, than check the python flags and numpy header directories") 
+    message( FATAL_ERROR "${NUMPY_INCLUDE}/numpy/arrayobject.h header is not found. If it is installed, than check the python flags and numpy header directories")
 endif( NOT EXISTS ${NUMPY_INCLUDE}/numpy/arrayobject.h )
 
 # Look for armadillo
@@ -96,10 +96,10 @@ set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/woma.i PROPERTIES CP
 if(ARMADILLO_FOUND)
     set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/woma.i PROPERTIES SWIG_FLAGS "-DUSE_ARMA")
 endif(ARMADILLO_FOUND)
-SET(SWIG_MODULE_woma_EXTRA_DEPS 
+SET(SWIG_MODULE_woma_EXTRA_DEPS
     woma_doc.i
 )
-SWIG_ADD_MODULE(woma python ${CMAKE_CURRENT_SOURCE_DIR}/src/woma.i)
+SWIG_ADD_LIBRARY(woma TYPE MODULE LANGUAGE python SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/woma.i)
 SWIG_LINK_LIBRARIES(woma ${PYTHON_LIBRARIES} woma)
 
 add_custom_command(TARGET _woma POST_BUILD COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/src/move_files.sh)

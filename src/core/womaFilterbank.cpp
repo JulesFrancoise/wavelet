@@ -384,17 +384,18 @@ void woma::Filterbank::update(float value) {
             }
         }
         result_complex[filter_index] = std::complex<double>(0., 0.);
+        
+        std::size_t decim = static_cast<std::size_t>(data_it->first);
 
-        // Padding: before
+        // Padding: before (initial index in wrong!! See JS implementation)
+        std::size_t initial_index = data_it->second.size() -
+            decim * wavelets_[filter_index]->window_size.get();
         result_complex[filter_index] =
-            std::complex<double>(data_it->second[0], 0) *
+            std::complex<double>(data_it->second[initial_index], 0) *
             wavelets_[filter_index]->prepad_value_;
         // Data
         std::size_t wvt_index(0);
-        std::size_t decim = static_cast<std::size_t>(data_it->first);
-        for (std::size_t data_index =
-                             data_it->second.size() -
-                             decim * wavelets_[filter_index]->window_size.get();
+        for (std::size_t data_index = initial_index;
              data_index < data_it->second.size();
              data_index += decim, wvt_index++) {
             result_complex[filter_index] +=
